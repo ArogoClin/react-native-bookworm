@@ -1,7 +1,7 @@
 // auth controller.js  
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken'; // Import at the top
+import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
 
@@ -56,10 +56,19 @@ export const register = async (req, res) => {
 
     const token = generateToken(newUser);
 
-    res.status(201).json({ user: newUser, token });
+    // Don't send password to client
+    res.status(201).json({ 
+      user: {
+        id: newUser.id,
+        username: newUser.username,
+        email: newUser.email,
+        profileImage: newUser.profileImage
+      }, 
+      token 
+    });
   } catch (error) {
-    console.error('Registration error:', error); // ADD THIS LINE
-    res.status(500).json({ error: 'Registration failed', details: error.message }); // ADD details
+    console.error('Registration error:', error);
+    res.status(500).json({ error: 'Registration failed', details: error.message });
   }
 }
 
@@ -84,9 +93,18 @@ export const login = async (req, res) => {
 
     const token = generateToken(user);
 
-    res.status(200).json({ user, token });
+    // Don't send password to client
+    res.status(200).json({ 
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        profileImage: user.profileImage
+      }, 
+      token 
+    });
   } catch (error) {
-    console.error('Login error:', error); // ADD THIS LINE
-    res.status(500).json({ error: 'Login failed', details: error.message }); // ADD details
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Login failed', details: error.message });
   }
 };
