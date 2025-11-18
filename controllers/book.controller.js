@@ -159,6 +159,55 @@ export const getRecommendedBooks = async (req, res) => {
     }
 };
 
+// Get books for the authenticated user (for profile page)
+export const getUserBooks = async (req, res) => {
+    try {
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({ error: 'User not authenticated' });
+        }
+
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        const books = await prisma.book.findMany({
+            where: { userId: req.user.id },
+            include: {
+                user: {
+                    select: {
+                        id: true,
+                        username: true,
+                        email: true,
+                        profileImage: true,
+                    },
+                },
+            },
+            orderBy: { createdAt: 'desc' },
+            skip,
+            take: limit,
+        });
+
+        const totalBooks = await prisma.book.count({
+            where: { userId: req.user.id },
+        });
+
+        const totalPages = Math.ceil(totalBooks / limit);
+
+        res.status(200).json({
+            books,
+            currentPage: page,
+            totalPages,
+            totalBooks,
+        });
+    } catch (error) {
+        console.error('Error fetching user books:', error);
+        res.status(500).json({ 
+            error: 'Failed to fetch user books',
+            message: error.message 
+        });
+    }
+};
+
 // Delete book
 export const deleteBook = async (req, res) => {
     try {
