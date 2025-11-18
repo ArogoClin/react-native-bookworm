@@ -62,7 +62,8 @@ export const register = async (req, res) => {
         id: newUser.id,
         username: newUser.username,
         email: newUser.email,
-        profileImage: newUser.profileImage
+        profileImage: newUser.profileImage,
+        createdAt: newUser.createdAt
       }, 
       token 
     });
@@ -99,7 +100,8 @@ export const login = async (req, res) => {
         id: user.id,
         username: user.username,
         email: user.email,
-        profileImage: user.profileImage
+        profileImage: user.profileImage,
+        createdAt: user.createdAt
       }, 
       token 
     });
